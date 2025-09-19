@@ -1,13 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
-import connectDB from "./config/database.js";
+// import connectDB from "./config/database.js";
 import router from "./routes/index.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { connectDB, sequelize } from "./config/database.js";
 
 dotenv.config();
-connectDB();
+// connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +31,18 @@ app.use("/api", router);
 //   res.send("Hello World!");
 // });
 
-app.listen(PORT, () => {
-  console.log(` running on  ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    await sequelize.sync();  // auto create tables
+    console.log("All right");
+
+    app.listen(PORT, () => {
+      console.log(`http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+startServer();

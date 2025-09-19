@@ -3,7 +3,7 @@ import User from "../models/user.js";
 const verifyController = async (req, res) => {
   const { token } = req.params;
 
-  const user = await User.findOne({ verificationToken: token });
+  const user = await User.findOne({ where: { verificationToken: token } });
 
   if (!user) {
     return res.status(400).json({ message: "Invalid token" });

@@ -21,13 +21,13 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (form.password !== form.confirmPassword) {
-      return toast.error("Password and Confirm Password do not match!");
-    }
+    // if (form.password !== form.confirmPassword) {
+    //   return toast.error("Password and Confirm Password do not match!");
+    // }
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/signup", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -36,10 +36,7 @@ export default function Signup() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || "Signup successful!", {
-          onClose: () => navigate("/login"),
-          autoClose: 6000,
-        });
+        navigate("/login"); 
         setForm({ name: "", email: "", password: "", confirmPassword: "" });
       } else {
         toast.error(data.message || "Signup failed!");
@@ -53,21 +50,20 @@ export default function Signup() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch("http://localhost:5000/api/google", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: credentialResponse.credential }),
+        credentials:"include",
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || "Google Signup successful!", {
-          autoClose: 2000,
-          onClose: () => navigate("/home"),
-        });
+        navigate("/home");
+        setForm({ email: "", password: "" });
       } else {
-        toast.error(data.message || "Google signup failed!");
+        toast.error(data.message || "Login failed!");
       }
     } catch (err) {
       toast.error("Google signup error!");

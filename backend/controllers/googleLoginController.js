@@ -19,7 +19,7 @@ const googleLoginController = async (req, res) => {
     const payload = ticket.getPayload();
     const { email, name, sub } = payload;
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ where: { email } });
 
     if (user) {
       if (!user.googleId) {
@@ -37,7 +37,7 @@ const googleLoginController = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email, role: user.role },
+      { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -50,7 +50,7 @@ const googleLoginController = async (req, res) => {
     return res.status(200).json({
       message: "Google login successful",
       user: {
-        id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,

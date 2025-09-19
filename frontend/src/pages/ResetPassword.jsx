@@ -14,9 +14,8 @@ export default function ResetPassword() {
   useEffect(() => {
     const checkToken = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:5000/api/reset-password/${token}`
-        );
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reset-password/${token}`);
+
         const data = await res.json();
         if (res.ok) {
           setValidToken(true);
@@ -44,14 +43,14 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/reset-password/${token}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        }
-      );
+     const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/reset-password/${token}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
 
       const data = await res.json();
       if (res.ok) {

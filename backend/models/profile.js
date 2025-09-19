@@ -1,43 +1,50 @@
-import mongoose from "mongoose";
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
+import User from "./user.js";
 
-const profileSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const Profile = sequelize.define("Profile", {
+  headline: { 
+    type: DataTypes.STRING, 
+    defaultValue: "" 
   },
-  headline: { type: String, default: "" },
-  bio: { type: String, default: "" },
-  location: { type: String, default: "" },
-  profilePicture: { type: String, default: "" },
-  bannerImage: { type: String, default: "" },
-  experience: [
-    {
-      title: String,
-      company: String,
-      startDate: Date,
-      endDate: Date,
-      description: String,
-    },
-  ],
-  education: [
-    {
-      school: String,
-      degree: String,
-      startDate: Date,
-      endDate: Date,
-      description: String,
-    },
-  ],
-  skills: [String],
-  socialLinks: {
-    linkedin: String,
-    github: String,
-    twitter: String,
-    website: String,
+  bio: { 
+    type: DataTypes.TEXT, 
+    defaultValue: "" 
   },
+  location: { 
+    type: DataTypes.STRING, 
+    defaultValue: "" 
+  },
+  profilePicture: { 
+    type: DataTypes.STRING, 
+    defaultValue: "" 
+  },
+  bannerImage: { 
+    type: DataTypes.STRING, 
+    defaultValue: "" 
+  },
+
+  
+  experience: { 
+    type: DataTypes.JSON, 
+    defaultValue: [] 
+  }, 
+  education: { 
+    type: DataTypes.JSON, 
+    defaultValue: [] 
+  }, 
+  skills: { 
+    type: DataTypes.JSON, 
+    defaultValue: [] 
+  },     
+  socialLinks: { 
+    type: DataTypes.JSON, 
+    defaultValue: {} 
+  } 
 });
 
-const Profile = mongoose.model("Profile", profileSchema);
+
+User.hasOne(Profile, { foreignKey: "userId", onDelete: "CASCADE" });
+Profile.belongsTo(User, { foreignKey: "userId" });
 
 export default Profile;

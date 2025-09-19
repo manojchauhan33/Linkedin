@@ -5,6 +5,7 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
+import EditProfilePage from "../pages/EditProfilePage";
 import Middleware from "../components/Middleware";
 
 const AppRoutes = () => {
@@ -42,6 +43,14 @@ const AppRoutes = () => {
         element={
           <Middleware>
             <ProfilePage />
+          </Middleware>
+        }
+      />
+      <Route
+        path="/edit-profile"
+        element={
+          <Middleware>
+            <EditProfilePage />
           </Middleware>
         }
       />

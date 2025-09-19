@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -46,9 +46,10 @@ export default function Login() {
     }
   };
 
+  
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch("http://localhost:5000/api/google", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -58,14 +59,12 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success(data.message || "Google Login successful!", {
-          autoClose: 2000,
-          onClose: () => navigate("/home"),
-        });
-      } else {
-        toast.error(data.message || "Google login failed!");
-      }
-    } catch (err) {
+      navigate("/home");
+      setForm({ email: "", password: "" });
+    } else {
+      toast.error(data.message || "Login failed!");
+    }
+        } catch (err) {
       toast.error("Google login error!");
     }
   };

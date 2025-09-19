@@ -1,24 +1,25 @@
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
+import { Op } from "sequelize";  
 
 const verifyResetTokenController = async (req, res) => {
   try {
     const { token } = req.params;
 
     const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { [Op.gt]: new Date() }, 
+      },
     });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Valid token. Proceed to reset password." });
+    res.status(200).json({ message: "Valid token. Proceed to reset password." });
   } catch (err) {
-    console.error(err);
+    console.error("verifyResetTokenController error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -37,26 +38,31 @@ const resetPasswordController = async (req, res) => {
     }
 
     const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: { [Op.gt]: new Date() },
+      },
     });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
+    
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
 
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
+    
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
     await user.save();
 
     res
       .status(200)
       .json({ message: "Password reset successful. You can log in now." });
   } catch (err) {
-    console.error(err);
+    console.error("resetPasswordController error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

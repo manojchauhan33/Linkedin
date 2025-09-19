@@ -8,7 +8,7 @@ function Middleware({ children }) {
   const location = useLocation();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/check-auth", {
+    fetch(`${import.meta.env.VITE_API_URL}/api/check-auth`, {
       method: "GET",
       credentials: "include",
     })
@@ -16,14 +16,14 @@ function Middleware({ children }) {
         if (res.ok) {
           setIsAuthenticated(true);
 
-          // ✅ If user is on login or signup, but already authenticated → go home
+          
           if (location.pathname === "/" || location.pathname === "/login") {
             navigate("/home", { replace: true });
           }
         } else {
           setIsAuthenticated(false);
 
-          // ✅ If user tries a protected route without token → go login
+          
           if (location.pathname !== "/" && location.pathname !== "/login") {
             navigate("/login", { replace: true });
           }
