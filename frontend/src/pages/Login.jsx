@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GoogleLogin } from "@react-oauth/google";
 
-export default function Login() {
+function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
@@ -14,7 +14,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value.trim()});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,18 +27,18 @@ export default function Login() {
         body: JSON.stringify(form),
         credentials: "include",
       });
+      
 
       const data = await res.json();
 
+      // console.log(data);
+
       if (res.ok) {
-        toast.success(data.message || "Login successful!", {
-          autoClose: 3000,
-          onClose: () => navigate("/home"),
-        });
-        setForm({ email: "", password: "" });
-      } else {
-        toast.error(data.message || "Login failed!");
-      }
+      setForm({ email: "", password: "" });
+      navigate("/home");
+    } else {
+      toast.error(data.message || "Login failed!");
+    }
     } catch (err) {
       toast.error("Something went wrong!");
     } finally {
@@ -46,7 +46,6 @@ export default function Login() {
     }
   };
 
-  
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/google`, {
@@ -59,18 +58,18 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-      navigate("/home");
-      setForm({ email: "", password: "" });
-    } else {
-      toast.error(data.message || "Login failed!");
-    }
-        } catch (err) {
+        navigate("/home");
+        setForm({ email: "", password: "" });
+      } else {
+        toast.error(data.message || "Login failed!");
+      }
+    } catch (err) {
       toast.error("Google login error!");
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100 space-y-6">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8 space-y-6">
       <div>
         <svg
           className="absolute top-1 left-1"
@@ -91,7 +90,7 @@ export default function Login() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-96 space-y-6"
+        className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 sm:space-y-6"
       >
         <h2 className="text-2xl font-bold text-center text-gray-700">Login</h2>
 
@@ -126,7 +125,7 @@ export default function Login() {
         </button>
 
         <p className="text-center text-gray-500 text-sm mt-2">
-          Don&apos;t have an account?{" "}
+          Don't have an account?{" "}
           <a href="/" className="text-blue-600 hover:underline">
             Sign Up
           </a>
@@ -137,7 +136,7 @@ export default function Login() {
           </a>
         </p>
 
-        <div className="w-50 bg-white p-4 rounded-lg shadow-md flex justify-center">
+        <div className="w-full bg-white p-4 rounded-lg shadow-md flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => toast.error("Google login failed!")}
@@ -147,7 +146,7 @@ export default function Login() {
 
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -160,3 +159,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default Login;

@@ -7,6 +7,7 @@ import Home from "../pages/Home";
 import ProfilePage from "../pages/ProfilePage";
 import EditProfilePage from "../pages/EditProfilePage";
 import Middleware from "../components/Middleware";
+import Postpage from "../pages/Postpage";
 
 const AppRoutes = () => {
   return (
@@ -51,6 +52,14 @@ const AppRoutes = () => {
         element={
           <Middleware>
             <EditProfilePage />
+          </Middleware>
+        }
+      />
+      <Route
+        path="postpage"
+        element={
+          <Middleware>
+            <Postpage/>
           </Middleware>
         }
       />

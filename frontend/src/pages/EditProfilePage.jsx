@@ -1,39 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FiCamera, FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import Header from "../components/Header";
-
-
 
 const EditProfilePage = () => {
   const [profile, setProfile] = useState(null);
   const [profilePictureFile, setProfilePictureFile] = useState(null);
   const [bannerFile, setBannerFile] = useState(null);
+  const [removeProfilePic, setRemoveProfilePic] = useState(false);
+  const [removeBanner, setRemoveBanner] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/me`, {
-      method: "GET",
-      credentials: "include",
-    });
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    const data = await res.json();
-
-  
-    setProfile({
-      ...data.profile,     // profile fields
-      user: data.user,     // user object
-      profilePicture: data.profilePicture,
-    });
-  } catch (err) {
-    console.error("Error fetching profile:", err);
-  }
-};
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile/me`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const data = await res.json();
+        setProfile({
+          ...data.profile,
+          user: data.user,
+          profilePicture: data.profilePicture,
+        });
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
     fetchProfile();
   }, []);
 
-  if (!profile) return <div className="text-center mt-20">Loading profile...</div>;
+  if (!profile) {
+    return <div className="text-center mt-20">Loading profile...</div>;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,8 +43,12 @@ const EditProfilePage = () => {
 
   const handleArrayChange = (field, index, key, value) => {
     const updatedArray = [...(profile[field] || [])];
-    if (key) updatedArray[index][key] = value;
-    else updatedArray[index] = value;
+    if (key){ 
+      updatedArray[index][key] = value;
+    }
+    else{ 
+      updatedArray[index] = value;
+    }
     setProfile({ ...profile, [field]: updatedArray });
   };
 
@@ -58,29 +63,59 @@ const EditProfilePage = () => {
   };
 
   const handleRemoveImage = (type) => {
-    if (type === "profile") {
+    if (type === "profile") 
+    {
       setProfilePictureFile(null);
       setProfile({ ...profile, profilePicture: "" });
-    } else if (type === "banner") {
+      setRemoveProfilePic(true);
+    } 
+
+    else if (type === "banner") 
+    {
       setBannerFile(null);
       setProfile({ ...profile, bannerImage: "" });
+      setRemoveBanner(true);
     }
+
   };
 
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
       Object.keys(profile).forEach((key) => {
-        if (key === "user") return;
-        if (typeof profile[key] === "string" || typeof profile[key] === "number") {
+        // if (key === "user")
+        // { 
+        //   return;
+        // }
+        if (typeof profile[key] === "string" || typeof profile[key] === "number") 
+        {
           formData.append(key, profile[key]);
-        } else if (Array.isArray(profile[key]) || typeof profile[key] === "object") {
+        } 
+
+        else if (Array.isArray(profile[key]) || typeof profile[key] === "object") 
+        {
           formData.append(key, JSON.stringify(profile[key]));
         }
+
       });
 
-      if (profilePictureFile) formData.append("profilePicture", profilePictureFile);
-      if (bannerFile) formData.append("bannerImage", bannerFile);
+      if (profilePictureFile)
+      { 
+        formData.append("profilePicture", profilePictureFile);
+      }
+      if (bannerFile)
+      { 
+        formData.append("bannerImage", bannerFile);
+      }
+
+      if (removeProfilePic)
+      { 
+        formData.append("removeProfilePic", true);
+      }
+      if (removeBanner) 
+      {
+        formData.append("removeBanner", true);
+      }
 
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
         method: "POST",
@@ -88,13 +123,15 @@ const EditProfilePage = () => {
         body: formData,
       });
 
+      
+
+      //  console.log(res.json());
+
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       await res.json();
-      alert("Profile updated successfully!");
       navigate("/profilePage");
     } catch (err) {
       console.error("Error updating profile:", err);
-      alert(`Failed to update profile: ${err.message}`);
     }
   };
 
@@ -102,77 +139,90 @@ const EditProfilePage = () => {
     <div className="bg-gray-100 min-h-screen">
       <Header />
 
-      
-      <div className="relative">
-        <img
-          src={
-            bannerFile
-              ? URL.createObjectURL(bannerFile)
-              : profile.bannerImage
-              ? `${import.meta.env.VITE_API_URL}${profile.bannerImage}`
-              : "https://via.placeholder.com/800x200"
-          }
-          alt="Banner"
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-3 right-3 flex gap-2">
-          <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
-            Change Banner
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => setBannerFile(e.target.files[0])}
-            />
-          </label>
-          {(bannerFile || profile.bannerImage) && (
-            <button
-              onClick={() => handleRemoveImage("banner")}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              Remove
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mt-[-3rem] space-y-6 relative z-10">
-        <div className="flex items-center gap-4">
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden mt-6">
+        <div className="relative">
           <img
             src={
-              profilePictureFile
-                ? URL.createObjectURL(profilePictureFile)
-                : profile.profilePicture
-                ? `${import.meta.env.VITE_API_URL}${profile.profilePicture}`
-                : "https://via.placeholder.com/150"
+              bannerFile
+                ? URL.createObjectURL(bannerFile)
+                : profile.bannerImage
+                ? `${import.meta.env.VITE_API_URL}${profile.bannerImage}`
+                : "https://via.placeholder.com/800x200"
             }
-            alt="Profile"
-            className="w-24 h-24 rounded-full border-4 border-white object-cover"
+            alt="Banner"
+            className="w-full h-48 sm:h-60 object-cover"
           />
-          <div className="flex flex-col gap-2">
-            <label className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
-              Change Profile
+
+          {/*edit*/}
+          <div className="absolute top-3 right-3 flex gap-2">
+            <label className="bg-white p-2 rounded-full shadow cursor-pointer hover:bg-gray-100">
+              <FiCamera size={18} className="text-gray-600" />
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => setProfilePictureFile(e.target.files[0])}
+                onChange={(e) => {
+                  setBannerFile(e.target.files[0]);
+                  setRemoveBanner(false);
+                }}
               />
             </label>
-            {(profilePictureFile || profile.profilePicture) && (
+            {(bannerFile || profile.bannerImage) && (
               <button
-                onClick={() => handleRemoveImage("profile")}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                onClick={() => handleRemoveImage("banner")}
+                className="bg-white p-2 rounded-full shadow hover:bg-gray-100"
               >
-                Remove
+                <FiTrash2 size={18} className="text-red-500" />
               </button>
             )}
           </div>
+
+
+          {/* Profile picture */}
+          <div className="absolute left-4 sm:left-6 -bottom-16">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+              <img
+                src={
+                  profilePictureFile
+                    ? URL.createObjectURL(profilePictureFile)
+                    : profile.profilePicture
+                    ? `${import.meta.env.VITE_API_URL}${profile.profilePicture}`
+                    : "https://via.placeholder.com/150"
+                }
+                alt="Profile"
+                className="w-full h-full rounded-full border-4 border-white object-cover shadow-md"
+              />
+              <div className="absolute bottom-1 right-1 flex gap-1">
+                <label className="bg-white p-1.5 rounded-full shadow cursor-pointer hover:bg-gray-100">
+                  <FiCamera size={14} className="text-gray-600" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      setProfilePictureFile(e.target.files[0]);
+                      setRemoveProfilePic(false);
+                    }}
+                  />
+                </label>
+                {(profilePictureFile || profile.profilePicture) && (
+                  <button
+                    onClick={() => handleRemoveImage("profile")}
+                    className="bg-white p-1.5 rounded-full shadow hover:bg-gray-100"
+                  >
+                    <FiTrash2 size={14} className="text-red-500" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Cards for Info */}
-        <div className="space-y-4">
-          {/* Basic Info */}
+
+
+        {/* Form */}
+        <div className="p-4 sm:p-6 mt-20 space-y-6">
+          {/* user info */}
           <div className="p-4 border rounded-lg space-y-2">
             <h2 className="text-lg font-bold">Basic Info</h2>
             <input
@@ -200,150 +250,190 @@ const EditProfilePage = () => {
             />
           </div>
 
+
+
+
           {/* Skills */}
           <div className="p-4 border rounded-lg space-y-2">
             <h2 className="text-lg font-bold">Skills</h2>
             <button
               type="button"
               onClick={() => handleAddItem("skills", "")}
-              className="text-blue-600 text-sm mb-2"
+              className="flex items-center gap-1 text-blue-600 text-sm mb-2"
             >
-              + Add Skill
+              <FiPlus size={16} /> Add Skill
             </button>
             <div className="flex flex-wrap gap-2">
               {profile.skills?.map((skill, idx) => (
-                <div key={idx} className="flex gap-2">
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 border p-1 rounded flex-1 min-w-[120px]"
+                >
                   <input
                     value={skill}
-                    onChange={(e) => handleArrayChange("skills", idx, null, e.target.value)}
-                    className="border p-1 rounded"
+                    onChange={(e) =>
+                      handleArrayChange("skills", idx, null, e.target.value)
+                    }
+                    className="border-none outline-none w-full"
                   />
-                  <button
-                    onClick={() => handleRemoveItem("skills", idx)}
-                    className="text-red-500"
-                  >
-                    x
+                  <button onClick={() => handleRemoveItem("skills", idx)}>
+                    <FiX className="text-red-500" />
                   </button>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Experience */}
-          <div className="p-4 border rounded-lg space-y-2">
-            <h2 className="text-lg font-bold">Experience</h2>
-            <button
-              type="button"
-              onClick={() =>
-                handleAddItem("experience", { company: "", role: "", from: "", to: "" })
-              }
-              className="text-blue-600 text-sm mb-2"
-            >
-              + Add Experience
-            </button>
-            {profile.experience?.map((exp, idx) => (
-              <div key={idx} className="border p-2 rounded mb-2 space-y-1">
-                <input
-                  placeholder="Company"
-                  value={exp.company || ""}
-                  onChange={(e) => handleArrayChange("experience", idx, "company", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <input
-                  placeholder="Role"
-                  value={exp.role || ""}
-                  onChange={(e) => handleArrayChange("experience", idx, "role", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <input
-                  placeholder="From"
-                  value={exp.from || ""}
-                  onChange={(e) => handleArrayChange("experience", idx, "from", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <input
-                  placeholder="To"
-                  value={exp.to || ""}
-                  onChange={(e) => handleArrayChange("experience", idx, "to", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <button
-                  onClick={() => handleRemoveItem("experience", idx)}
-                  className="text-red-500"
+
+
+
+          
+          <div className="flex flex-col gap-4">
+            {/* Experience */}
+            <div className="p-4 border rounded-lg space-y-2">
+              <h2 className="text-lg font-bold">Experience</h2>
+              <button
+                type="button"
+                onClick={() =>
+                  handleAddItem("experience", { company: "", role: "", from: "", to: "" })
+                }
+                className="flex items-center gap-1 text-blue-600 text-sm mb-2"
+              >
+                <FiPlus size={16} /> Add Experience
+              </button>
+              {profile.experience?.map((exp, idx) => (
+                <div
+                  key={idx}
+                  className="border p-2 rounded mb-2 space-y-1 relative flex flex-col sm:flex-row sm:items-center sm:gap-2"
                 >
-                  Remove
-                </button>
-              </div>
-            ))}
+                  <button
+                    onClick={() => handleRemoveItem("experience", idx)}
+                    className="absolute top-2 right-2 text-red-500 sm:relative sm:top-0 sm:right-0"
+                  >
+                    <FiTrash2 />
+                  </button>
+                  <input
+                    placeholder="Company"
+                    value={exp.company || ""}
+                    onChange={(e) =>
+                      handleArrayChange("experience", idx, "company", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/4"
+                  />
+                  <input
+                    placeholder="Role"
+                    value={exp.role || ""}
+                    onChange={(e) =>
+                      handleArrayChange("experience", idx, "role", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/4"
+                  />
+                  <input
+                    placeholder="From"
+                    value={exp.from || ""}
+                    onChange={(e) =>
+                      handleArrayChange("experience", idx, "from", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/4"
+                  />
+                  <input
+                    placeholder="To"
+                    value={exp.to || ""}
+                    onChange={(e) =>
+                      handleArrayChange("experience", idx, "to", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/4"
+                  />
+                </div>
+              ))}
+            </div>
+
+
+
+            {/* Education */}
+            <div className="p-4 border rounded-lg space-y-2">
+              <h2 className="text-lg font-bold">Education</h2>
+              <button
+                type="button"
+                onClick={() =>
+                  handleAddItem("education", { school: "", degree: "", year: "" })
+                }
+                className="flex items-center gap-1 text-blue-600 text-sm mb-2"
+              >
+                <FiPlus size={16} /> Add Education
+              </button>
+              {profile.education?.map((edu, idx) => (
+                <div
+                  key={idx}
+                  className="border p-2 rounded mb-2 space-y-1 relative flex flex-col sm:flex-row sm:items-center sm:gap-2"
+                >
+                  <button
+                    onClick={() => handleRemoveItem("education", idx)}
+                    className="absolute top-2 right-2 text-red-500 sm:relative sm:top-0 sm:right-0"
+                  >
+                    <FiTrash2 />
+                  </button>
+                  <input
+                    placeholder="School"
+                    value={edu.school || ""}
+                    onChange={(e) =>
+                      handleArrayChange("education", idx, "school", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/3"
+                  />
+                  <input
+                    placeholder="Degree"
+                    value={edu.degree || ""}
+                    onChange={(e) =>
+                      handleArrayChange("education", idx, "degree", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/3"
+                  />
+                  <input
+                    placeholder="Year"
+                    value={edu.year || ""}
+                    onChange={(e) =>
+                      handleArrayChange("education", idx, "year", e.target.value)
+                    }
+                    className="border p-1 rounded w-full sm:w-1/3"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Education */}
-          <div className="p-4 border rounded-lg space-y-2">
-            <h2 className="text-lg font-bold">Education</h2>
-            <button
-              type="button"
-              onClick={() => handleAddItem("education", { school: "", degree: "", year: "" })}
-              className="text-blue-600 text-sm mb-2"
-            >
-              + Add Education
-            </button>
-            {profile.education?.map((edu, idx) => (
-              <div key={idx} className="border p-2 rounded mb-2 space-y-1">
-                <input
-                  placeholder="School"
-                  value={edu.school || ""}
-                  onChange={(e) => handleArrayChange("education", idx, "school", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <input
-                  placeholder="Degree"
-                  value={edu.degree || ""}
-                  onChange={(e) => handleArrayChange("education", idx, "degree", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <input
-                  placeholder="Year"
-                  value={edu.year || ""}
-                  onChange={(e) => handleArrayChange("education", idx, "year", e.target.value)}
-                  className="border p-1 rounded w-full"
-                />
-                <button
-                  onClick={() => handleRemoveItem("education", idx)}
-                  className="text-red-500"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
+
 
           {/* Social Links */}
           <div className="p-4 border rounded-lg space-y-2">
             <h2 className="text-lg font-bold">Social Links</h2>
-            {["linkedin", "github", "twitter", "facebook"].map((platform) => (
-              <input
-                key={platform}
-                placeholder={platform}
-                value={profile.socialLinks?.[platform] || ""}
-                onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    socialLinks: { ...profile.socialLinks, [platform]: e.target.value },
-                  })
-                }
-                className="border p-1 rounded w-full"
-              />
-            ))}
+            <div className="flex flex-col sm:flex-row sm:gap-2 flex-wrap">
+              {["linkedin", "github", "twitter", "facebook"].map((platform) => (
+                <input
+                  key={platform}
+                  placeholder={platform}
+                  value={profile.socialLinks?.[platform] || ""}
+                  onChange={(e) =>
+                    setProfile({
+                      ...profile,
+                      socialLinks: { ...profile.socialLinks, [platform]: e.target.value },
+                    })
+                  }
+                  className="border p-1 rounded w-full sm:w-[48%] mb-2"
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-          >
-            Save Profile
-          </button>
+
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={handleSubmit}
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            >
+              Save Profile
+            </button>
+          </div>
         </div>
       </div>
     </div>

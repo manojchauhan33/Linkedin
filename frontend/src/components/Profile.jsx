@@ -13,9 +13,6 @@ const Profile = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // const API_URL = "http://localhost:5000";
-
-  // Fetch profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -26,7 +23,7 @@ const Profile = () => {
 
         if (!res.ok) {
           if (res.status === 401) {
-            toast.error("Please log in to view your profile.");
+            // toast.error("Please log in to view your profile.");
             navigate("/login");
             return;
           } else {
@@ -37,19 +34,15 @@ const Profile = () => {
 
         const data = await res.json();
 
-        const fullProfilePictureUrl = data.profilePicture
-          ? data.profilePicture.startsWith("http")
-            ? data.profilePicture
-            : `${import.meta.env.VITE_API_URL}${data.profilePicture}`
-          : "";
-
         setProfileData({
-        userName: data.user?.name || "User",
-        email: data.user?.email || "",
-        profilePicture: data.profilePicture
-          ? `${import.meta.env.VITE_API_URL}${data.profilePicture}`
-          : "",
-      });
+          userName: data.user?.name || "User",
+          email: data.user?.email || "",
+          profilePicture: data.profilePicture
+            ? data.profilePicture.startsWith("http")
+              ? data.profilePicture
+              : `${import.meta.env.VITE_API_URL}${data.profilePicture}`
+            : "",
+        });
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -58,7 +51,6 @@ const Profile = () => {
     fetchProfile();
   }, [navigate]);
 
-  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -71,7 +63,6 @@ const Profile = () => {
     };
   }, []);
 
-  // Logout
   const handleLogout = async () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
@@ -83,7 +74,7 @@ const Profile = () => {
         throw new Error("Logout request failed.");
       }
 
-      toast.success("Logout successful!");
+      
       navigate("/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -93,33 +84,28 @@ const Profile = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      
       <img
         src={profileData.profilePicture || "https://via.placeholder.com/60"}
         alt={profileData.userName}
-        className="w-12 h-12 rounded-full cursor-pointer border-2 border-gray-300 hover:scale-105 transition"
+        className="w-10 h-10 rounded-full cursor-pointer border-2 border-gray-300 hover:scale-105 transition ml-20"
         onClick={() => setOpen(!open)}
       />
 
-      
       {open && (
-        <div className="absolute right-0 mt-3 w-72 bg-white border rounded-lg shadow-xl z-50">
-          
+        <div className="absolute right-0 mt-3 w-80 bg-white border rounded-lg shadow-xl z-50">
           <div className="flex items-center space-x-4 px-4 py-4 border-b">
             <img
-              src={
-                profileData.profilePicture || "https://via.placeholder.com/60"
-              }
+              src={profileData.profilePicture || "https://via.placeholder.com/60"}
               alt={profileData.email}
               className="w-14 h-14 rounded-full border"
             />
-            <div>
-              <p className="font-semibold text-lg">{profileData.userName}</p>
-              <p className="text-sm text-gray-500">{profileData.email}</p>
+            <div className="overflow-hidden">
+              <p className="font-semibold text-lg truncate">{profileData.userName}</p>
+              <p className="text-sm text-gray-500 truncate">{profileData.email}</p>
             </div>
           </div>
 
-          {/* Actions */}
+          
           <button
             onClick={() => navigate("/profilePage")}
             className="block w-full text-left px-4 py-3 text-sm hover:bg-gray-100"

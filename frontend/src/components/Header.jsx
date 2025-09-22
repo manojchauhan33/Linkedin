@@ -1,21 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoHome } from "react-icons/io5";
 import { BsFillPeopleFill } from "react-icons/bs";
-import { FaShoppingBag } from "react-icons/fa";
+import { FaShoppingBag, FaSearch } from "react-icons/fa";
 import { AiFillMessage } from "react-icons/ai";
 import { IoMdNotifications } from "react-icons/io";
-import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Profile from "./Profile";
+import { FiMenu, FiX } from "react-icons/fi";
 
 const Header = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <header className="bg-white border-b shadow-sm h-16 flex items-center justify-between px-10">
-      <div className="flex items-center space-x-8">
+    <header className="bg-white border-b shadow-sm h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 md:px-10 relative">
+      
+      <div className="flex items-center space-x-3 sm:space-x-6">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 34 34"
-          className="w-8 h-8"
+          className="w-7 h-7 sm:w-8 sm:h-8"
         >
           <g>
             <rect width="34" height="34" fill="#0A66C2" rx="4" />
@@ -30,42 +33,87 @@ const Header = () => {
           </g>
         </svg>
 
-        <div className="relative hidden sm:flex items-center">
+        
+
+        <div className="relative flex items-center w-28 sm:w-48 md:w-64">
           <FaSearch className="absolute left-3 text-gray-500 text-sm" />
           <input
             type="text"
             placeholder="Search"
-            className="pl-9 pr-3 py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-56"
+            className="pl-9 pr-3 py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full"
           />
         </div>
       </div>
 
-      <nav className="flex space-x-14 text-gray-600 ">
-        <Link to="/home" className="flex flex-col items-center hover:text-blue-600">
-          <IoHome size={20} />
-          <span className="text-xs">Home</span>
-        </Link>
-        <button className="flex flex-col items-center hover:text-blue-600">
-          <BsFillPeopleFill size={20} />
-          <span className="text-xs">Network</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-blue-600">
-          <FaShoppingBag size={20} />
-          <span className="text-xs">Jobs</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-blue-600">
-          <AiFillMessage size={20} />
-          <span className="text-xs">Messaging</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-blue-600">
-          <IoMdNotifications size={20} />
-          <span className="text-xs">Notifications</span>
-        </button>
-      </nav>
+      
 
-      <div className="flex flex-col items-center">
-        <Profile />
+      <div className="flex items-center space-x-2">
+        
+        {/* <nav className="hidden sm:flex space-x-4 md:space-x-6 text-gray-600"></nav> */}
+        <nav className="hidden sm:flex space-x-8 md:space-x-14 text-gray-600">
+          <Link to="/home" className="flex flex-col items-center hover:text-blue-600">
+            <IoHome size={20} />
+            <span className="text-xs">Home</span>
+          </Link>
+          <Link to="/network" className="flex flex-col items-center hover:text-blue-600">
+            <BsFillPeopleFill size={20} />
+            <span className="text-xs">Network</span>
+          </Link>
+          <Link to="/jobs" className="flex flex-col items-center hover:text-blue-600">
+            <FaShoppingBag size={20} />
+            <span className="text-xs">Jobs</span>
+          </Link>
+          <Link to="/messaging" className="flex flex-col items-center hover:text-blue-600">
+            <AiFillMessage size={20} />
+            <span className="text-xs">Messaging</span>
+          </Link>
+          <Link to="/notifications" className="flex flex-col items-center hover:text-blue-600">
+            <IoMdNotifications size={20} />
+            <span className="text-xs">Notifications</span>
+          </Link>
+        </nav>
+        
+
+        
+
+        <button
+          className="sm:hidden text-2xl text-gray-700"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <FiX /> : <FiMenu />}
+        </button>
+
+        
+        <div>
+          <Profile />
+        </div>
       </div>
+
+
+
+
+      
+      {isOpen && (
+        <div className="absolute top-14 left-0 w-64 h-screen bg-white shadow-lg z-50 p-4 flex flex-col space-y-6 sm:hidden">
+          <nav className="flex flex-col space-y-4 text-gray-700">
+            <Link to="/home" className="flex items-center gap-3 hover:text-blue-600">
+              <IoHome size={20} /> <span>Home</span>
+            </Link>
+            <Link to="/network" className="flex items-center gap-3 hover:text-blue-600">
+              <BsFillPeopleFill size={20} /> <span>Network</span>
+            </Link>
+            <Link to="/jobs" className="flex items-center gap-3 hover:text-blue-600">
+              <FaShoppingBag size={20} /> <span>Jobs</span>
+            </Link>
+            <Link to="/messaging" className="flex items-center gap-3 hover:text-blue-600">
+              <AiFillMessage size={20} /> <span>Messaging</span>
+            </Link>
+            <Link to="/notifications" className="flex items-center gap-3 hover:text-blue-600">
+              <IoMdNotifications size={20} /> <span>Notifications</span>
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

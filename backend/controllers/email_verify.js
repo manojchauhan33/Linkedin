@@ -14,8 +14,11 @@ const verifyController = async (req, res) => {
   }
 
   user.isVerified = true;
-  user.verificationToken = undefined;
-  user.tokenExpires = undefined;
+  // user.verificationToken = undefined;
+  // user.tokenExpires = undefined;
+
+   user.verificationToken = null;
+  user.tokenExpires = null;
   await user.save();
 
   res

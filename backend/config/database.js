@@ -18,7 +18,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const sequelize = new Sequelize(
+const sequelize = new Sequelize(           //db se connect krne ka bject (constructor)
   process.env.MYSQL_DB,   
   process.env.MYSQL_USER, 
   process.env.MYSQL_PASS, 
@@ -35,9 +35,9 @@ const sequelize = new Sequelize(
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log("MySQL");
+    console.log("sql connected");
   } catch (error) {
-    console.error(" Error connecting DB:", error);
+    console.error( error);
   }
 };
 

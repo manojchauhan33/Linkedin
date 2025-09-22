@@ -2,40 +2,50 @@ import Profile from "../models/profile.js";
 import User from "../models/user.js";
 
 
-export const upsertProfile = async (req, res) => {
+export const upserProfile = async (req, res) => {
   try {
     const userId = req.user.userId;
 
     let profileData = { ...req.body };
 
     
-    if (profileData.experience && typeof profileData.experience === "string") {
+    if (profileData.experience && typeof profileData.experience === "string") 
+    {
       profileData.experience = JSON.parse(profileData.experience);
     }
-    if (profileData.education && typeof profileData.education === "string") {
+    if (profileData.education && typeof profileData.education === "string") 
+    {
       profileData.education = JSON.parse(profileData.education);
     }
-    if (profileData.skills && typeof profileData.skills === "string") {
+    if (profileData.skills && typeof profileData.skills === "string") 
+    {
       profileData.skills = JSON.parse(profileData.skills);
     }
-    if (profileData.socialLinks && typeof profileData.socialLinks === "string") {
+    if (profileData.socialLinks && typeof profileData.socialLinks === "string") 
+    {
       profileData.socialLinks = JSON.parse(profileData.socialLinks);
     }
 
-    if (req.files?.profilePicture) {
+    if (req.files?.profilePicture) 
+    {
       profileData.profilePicture = `/uploads/${req.files.profilePicture[0].filename}`;
     }
-    if (req.files?.bannerImage) {
+
+    if (req.files?.bannerImage) 
+    {
       profileData.bannerImage = `/uploads/${req.files.bannerImage[0].filename}`;
     }
 
     let profile = await Profile.findOne({ where: { userId } });
 
-    console.log(profile);
+    // console.log(profile);
 
-    if (profile) {
+    if (profile) 
+    {
       await profile.update(profileData);
-    } else {
+    } 
+    
+    else {
       profile = await Profile.create({ ...profileData, userId });
     }
 
@@ -47,31 +57,6 @@ export const upsertProfile = async (req, res) => {
 };
 
 
-
-// export const getMyProfile = async (req, res) => {
-//   try {
-//     const profile = await Profile.findOne({
-//       where: { userId: req.user.userId },
-//       include: [{ model: User, attributes: ["name", "email"] }],
-//     });
-
-//     if (!profile) {
-//       const user = await User.findByPk(req.user.userId, {
-//         attributes: ["name", "email"],
-//       });
-
-//       return res.json({
-//         user: user || null,
-//         profilePicture: "", 
-//       });
-//     }
-
-//     res.json(profile);
-//   } catch (error) {
-//     console.error("Error in getMyProfile:", error);
-//     res.status(500).json({ error: "Server error", details: error.message });
-//   }
-// };
 
 
 export const getMyProfile = async (req, res) => {
@@ -88,16 +73,17 @@ export const getMyProfile = async (req, res) => {
 
       return res.json({
         user: user || null,
-        profile: {}, // always return an object instead of null
+        profile: {},
         profilePicture: "",
       });
     }
 
     res.json({
       user: profile.User,
-      profile: profile, // always under profile
+      profile: profile,
       profilePicture: profile.profilePicture || "",
     });
+
   } catch (error) {
     console.error("Error in getMyProfile:", error);
     res.status(500).json({ error: "Server error", details: error.message });

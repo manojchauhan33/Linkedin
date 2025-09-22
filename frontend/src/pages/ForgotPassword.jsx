@@ -3,7 +3,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Link } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function ForgotPassword() {
+function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,8 +36,8 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
-      <div>
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 px-4">
+     <div>
         <svg
           className="absolute top-1 left-1"
           width="120"
@@ -57,7 +57,7 @@ export default function ForgotPassword() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-96 space-y-6"
+        className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-6"
       >
         <h2 className="text-2xl font-bold text-center text-gray-700">
           Forgot Password
@@ -68,13 +68,13 @@ export default function ForgotPassword() {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
           required
         />
 
         <button
           type="submit"
-          className={`w-full py-3 rounded-md text-white font-medium ${
+          className={`w-full py-3 rounded-md text-white font-medium text-sm sm:text-base ${
             loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
           } transition-all duration-300`}
           disabled={loading}
@@ -83,7 +83,7 @@ export default function ForgotPassword() {
         </button>
 
         <div className="text-center">
-          <Link to="/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-blue-600 hover:underline text-sm sm:text-base">
             Back to Login
           </Link>
         </div>
@@ -93,3 +93,6 @@ export default function ForgotPassword() {
     </div>
   );
 }
+
+
+export default ForgotPassword;

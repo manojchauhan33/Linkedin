@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GoogleLogin } from "@react-oauth/google";
 
-export default function Signup() {
+const Signup = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -16,16 +16,12 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value.trim() });    //trim() remove extra spaces
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // if (form.password !== form.confirmPassword) {
-    //   return toast.error("Password and Confirm Password do not match!");
-    // }
-
+    e.preventDefault();   
     setLoading(true);
+
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup`, {
         method: "POST",
@@ -34,9 +30,11 @@ export default function Signup() {
       });
 
       const data = await res.json();
+      // console.log(res);
+      // console.log(data);
 
       if (res.ok) {
-        navigate("/login"); 
+        navigate("/login");
         setForm({ name: "", email: "", password: "", confirmPassword: "" });
       } else {
         toast.error(data.message || "Signup failed!");
@@ -48,13 +46,14 @@ export default function Signup() {
     }
   };
 
+
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: credentialResponse.credential }),
-        credentials:"include",
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -70,8 +69,9 @@ export default function Signup() {
     }
   };
 
+  
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-100 space-y-6">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8 space-y-6">
       <div>
         <svg
           className="absolute top-1 left-1"
@@ -92,7 +92,7 @@ export default function Signup() {
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-lg w-96 space-y-6"
+        className="bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-md space-y-4 sm:space-y-6"
       >
         <h2 className="text-2xl font-bold text-center text-gray-700">
           Sign Up
@@ -177,4 +177,6 @@ export default function Signup() {
       />
     </div>
   );
-}
+};
+
+export default Signup;

@@ -48,3 +48,9 @@ User.hasOne(Profile, { foreignKey: "userId", onDelete: "CASCADE" });
 Profile.belongsTo(User, { foreignKey: "userId" });
 
 export default Profile;
+
+
+// Profile → user ke personal info ke liye 1:1 relation
+// Post → user ke posts ke liye 1:N relation
+// belongsTo → child model me foreign key hota hai, aur parent info fetch kar sakte ho
+// hasOne / hasMany → parent model se child fetch kar sakte ho

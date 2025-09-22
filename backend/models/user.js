@@ -69,7 +69,7 @@ const User = sequelize.define("User", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true, // keep only email as unique
+    unique: true, 
   },
 
   password: {

@@ -7,7 +7,8 @@ import {resetPasswordController,verifyResetTokenController} from "../controllers
 import { googleLoginController } from "../controllers/googleLoginController.js";
 import { authentication } from "../middlewares/authentication.js";
 import { logoutController } from "../controllers/logout.js";
-import { getMyProfile, upsertProfile } from "../controllers/profileController.js";
+import { getMyProfile, upserProfile } from "../controllers/profileController.js";
+import {createPost,getAllPosts,getPostById} from "../controllers/postController.js";
 import upload from "../middlewares/upload.js";
 
 const router = express.Router();
@@ -30,10 +31,15 @@ router.post(
     { name: "profilePicture", maxCount: 1 },
     { name: "bannerImage", maxCount: 1 },
   ]),
-  upsertProfile
+  upserProfile
 );
-
 router.get("/profile/me", authentication, getMyProfile);
+router.post("/post", authentication, upload.array("media", 10), createPost);
+router.get("/getpost",authentication, getAllPosts);
+
+// router.get("/getpostbyid/:id",authentication, getPostById);
+// router.put("/updatepost/:id",authentication,upload.single("media"),updatePost);
+// router.delete("/deletepost/:id", authentication, deletePost);
 
 export default router;
 

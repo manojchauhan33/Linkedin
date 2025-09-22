@@ -6,12 +6,15 @@ const forgotPasswordController = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
+    if (!email) 
+    {
       return res.status(400).json({ message: "Email is required" });
     }
 
     const user = await User.findOne({ where: { email } });
-    if (!user) {
+
+    if (!user) 
+    {
       return res.status(400).json({ message: "User not found" });
     }
 
